@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Getter
-public class MemberRequest {
+public class RegisterRequest {
     String memberId;
     @Setter
     String memberPw;
