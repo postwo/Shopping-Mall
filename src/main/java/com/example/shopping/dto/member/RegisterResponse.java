@@ -2,13 +2,15 @@ package com.example.shopping.dto.member;
 
 import com.example.shopping.entity.member.Member;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Builder
+@Getter
 @Setter
-public class MemberResponse  {
+public class RegisterResponse {
     Long memberNum;
     String memberId;
     String memberPw;
@@ -23,8 +25,8 @@ public class MemberResponse  {
     LocalDate memberBirth;
     Integer point;
 
-    public static MemberResponse createMember(Member member){
-        return MemberResponse.builder()
+    public static RegisterResponse createMember(Member member){
+        return RegisterResponse.builder()
                 .memberNum(member.getMemberNum())
                 .memberId(member.getMemberId())
                 .memberPw(member.getMemberPw())

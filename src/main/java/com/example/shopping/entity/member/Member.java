@@ -1,14 +1,22 @@
 package com.example.shopping.entity.member;
 
-import com.example.shopping.dto.member.MemberRequest;
+import com.example.shopping.dto.member.RegisterRequest;
 import com.example.shopping.entity.member.role.MemberRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener; // 추가
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -18,7 +26,7 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class) // 2. Auditing 리스너 추가
-public class Member {
+public class Member implements UserDetails {
     @Id
     @Column(name = "member_num") // 3. 컬럼명 스네이크 케이스로 변경
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,7 +73,7 @@ public class Member {
     @Column(name = "point")
     private Integer point;
 
-    @Column
+    @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
@@ -81,7 +89,7 @@ public class Member {
         return Objects.hashCode(memberNum);
     }
 
-    public Member(MemberRequest dto) {
+    public Member(RegisterRequest dto) {
         this.memberId = dto.getMemberId();
         this.memberPw = dto.getMemberPw();
         this.memberName = dto.getMemberName();
@@ -93,6 +101,42 @@ public class Member {
         this.gender = dto.getGender();
         this.memberEmail = dto.getMemberEmail();
         this.memberEmailConf = dto.getMemberEmail();
-        this.role = MemberRole.ROLE_USER;
+        this.role = MemberRole.USER;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() { // 사용자 권한 반환
+        return List.of(new SimpleGrantedAuthority("ROLE_" + MemberRole.USER)); // ROLE_ 접두사를 붙여 권한 부여
+    }
+
+    @Override
+    public String getPassword() {
+        return this.getMemberPw();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.getMemberId();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
